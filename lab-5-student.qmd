@@ -1,3 +1,15 @@
+---
+title: "Lab-5-Alyssa-Walter"
+author: Alyssa Walter
+date: 3/21/25
+format: html
+editor: source
+embed-resources: true
+code-tools: true
+execute: 
+  echo: true
+  error: true
+---
 In this lab, we will be using the `dplyr` package to explore student evaluations
 of teaching data. 
 

@@ -2,7 +2,7 @@
 title: "Lab-5-Alyssa-Walter"
 author: Alyssa Walter
 date: 3/21/25
-format: html
+format: html 
 editor: source
 embed-resources: true
 code-tools: true
@@ -150,7 +150,7 @@ included in the `teacher_evals_codebook.pdf`.
 
 ```{r}
 #| label: setup
-# code chunk for loading packages
+library(tidyverse)
 
 ```
 
@@ -158,7 +158,7 @@ included in the `teacher_evals_codebook.pdf`.
 
 ```{r}
 #| label: load-data
-# code chunk for importing the data
+teacher_evals<-read.csv("data-raw/teacher_evals.csv")
 
 ```
 
@@ -168,8 +168,8 @@ included in the `teacher_evals_codebook.pdf`.
 
 ```{r}
 #| label: explore-data
-# you may want to use code to answer this question
-
+glimpse(teacher_evals)
+dim(teacher_evals)
 ```
 
 **4. What is the unit of observation (i.e. a single row in the dataset) identified by?**

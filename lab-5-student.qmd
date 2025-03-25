@@ -224,7 +224,7 @@ teacher_evals_clean|>
 ```{r}
 #| label: uncovering-missing-values
 
-teacher_evals_clean %>%
+teacher_evals_clean|>
   filter(if_any(everything(), is.na))  # filter for rows with na values
 
 ```
@@ -234,17 +234,38 @@ teacher_evals_clean %>%
 
 ```{r}
 #| label: exploring-demographics-of-instructors
-# code chunk for Q7
+
+# degree barplot
+ggplot(teacher_evals_clean, aes(x = academic_degree, fill = sex)) +
+  geom_bar(position = "stack") +
+  labs(title = "Academic Degree of Teachers by Sex", x = "Academic Degree", y = "# of Teachers") +
+  theme_minimal()
+
+# seniority barplot
+ggplot(teacher_evals_clean, aes(x = as.factor(seniority), fill = sex)) +
+  geom_bar(position = "stack") +
+  labs(title = "Seniority of Teachers by Sex", x = "Seniority", y = "# of Teachers") +
+  theme_minimal()
+
+# sex of teachers barplot
+ggplot(teacher_evals_clean, aes(x = sex)) +
+  geom_bar(fill = "indianred1") +
+  labs(title = "Sex of Teachers", x = "Sex", y = "# of Teachers") +
+  theme_minimal()
 
 ```
+> Most instructors in this dataset have a PhD (~4000 teachers) or a Masters (~2000 teachers), though there are a few (~500) with no degree, and the fewest ctegory are full professors. There is a roughly even amount of male and female instructors across all degree and senority categories, except there seem to be no female professors represented. There is a roughly equal distribution if senority levels (1-11), except for the most common level being 2.
 
 **9. Each course seems to have used a different subset of the nine evaluation questions. How many teacher-course combinations asked all nine questions?**
 
 ```{r}
 #| label: teacher-course-asked-every-question
-# code chunk for Q8
-
+teacher_evals_clean|>
+  group_by(course_id, teacher_id)|> #group by teacher and course
+  summarise(unique_questions = n_distinct(question_no)) |> #find the number of questions asked in each course
+  filter(unique_questions == 9) #select courses who asked all 9 questions
 ```
+> There are 49 teacher-course combinations who asked all 9 questions
 
 ## Rate my Professor
 

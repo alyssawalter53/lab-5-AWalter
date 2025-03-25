@@ -273,17 +273,41 @@ teacher_evals_clean|>
 
 ```{r}
 #| label: question-1-high-low
-# code chunk for Q9
+teacher_evals_clean|>
+  filter(question_no == 901)|> #filter for question 1
+  group_by(teacher_id, course_id) |> #group by teacher and course
+  summarise(avg_rating = mean(SET_score_avg, na.rm = TRUE)) |> #average scores for each teacher across their courses
+  ungroup() |>
+  summarise(
+    highest_teacher = teacher_id[which.max(avg_rating)], 
+    lowest_teacher = teacher_id[which.min(avg_rating)],
+    highest_rating = max(avg_rating),
+    lowest_rating = min(avg_rating))
 
 ```
+> 100131 had the highest average SET score and 100132 had the lowest. 
+
+> I recieved help with which. functions from https://r-coder.com/which-max-min-r/
 
 **11. Which instructors with one year of experience had the highest and lowest average percentage of students failing in the current semester across all their courses?**
 
 ```{r}
 #| label: one-year-experience-failing-students
-# code chunk for Q10
-
+teacher_evals_clean |>
+  filter(seniority == 1) |> #filter for a seniority level of 1
+  group_by(teacher_id) |>
+    summarise(
+    avg_fail_percent = mean(percent_failed_cur, na.rm = TRUE)
+  ) |> #average fail rate across all the teachers classes
+  ungroup() |>
+  summarise(
+    min_fail_teacher = teacher_id[which.min(avg_fail_percent)],# find the min fail rate
+    max_fail_teacher = teacher_id[which.max(avg_fail_percent)],# find the max fail rate
+    min_fail = min(avg_fail_percent),
+    max_fail = max(avg_fail_percent)
+  )
 ```
+> instructor 102379 had the lowest fail rate (0%) in that semester and 106692 had the highest (.68%).
 
 **12. Which female instructors with either a doctorate or professional degree had the highest and lowest average percent of students responding to the evaluation across all their courses?**
 

@@ -89,7 +89,7 @@ sure it looks nice.
 
 ## The Data
 
-The `teacher_evals` dataset contains student evaluations of reaching (SET)
+The `teacher_evals` dataset contains student evaluations of teaching (SET)
 collected from students at a University in Poland. There are SET surveys from 
 students in all fields and all levels of study offered by the university.
 
@@ -171,6 +171,7 @@ teacher_evals<-read.csv("data-raw/teacher_evals.csv")
 glimpse(teacher_evals)
 dim(teacher_evals)
 ```
+> This dataset includes student evaluations of their teachers, and information about the teacher's educational experience and gender. Student grades and class averages are also represented in the dataset, so we have the ability to compare student performance to teacher experience level. Class time and day of the week are also variables included in the student evaluations, so we can expore whether there is any relationship between class time and student performance.
 
 **4. What is the unit of observation (i.e. a single row in the dataset) identified by?**
 
@@ -179,6 +180,7 @@ dim(teacher_evals)
 # you may want to use code to answer this question
 
 ```
+> The unit of observation is each question on the student evaluation. Each row in the dataset is the class average of student results for a single question and teacher of a class.
 
 **5. Use _one_ `dplyr` pipeline to clean the data by:**
 
@@ -191,25 +193,42 @@ dim(teacher_evals)
 
 ```{r}
 #| label: data-cleaning
-# code chunk for Q4
+teacher_evals_clean <- teacher_evals|>
+  rename(sex = gender) |> #rename gender as sex
+  filter(no_participants >= 10) |> #select only classes with 10 or more students
+  mutate(
+    teacher_id = as.character(teacher_id),  #change teacher_id to a character
+    question_no = as.character(question_no) #change question_no to a character
+  ) |>
+  select(course_id, teacher_id, question_no, no_participants, resp_share, 
+         SET_score_avg, percent_failed_cur, academic_degree, seniority, sex) |> #keeping only the columns we want 
+  write_csv("data-clean/teacher_evals_clean.csv") #saving clean data
+
 
 ```
+
 
 **6. How many unique instructors and unique courses are present in the cleaned dataset?**
 
 ```{r}
 #| label: unique-courses
-# code chunk for Q5
+teacher_evals_clean|>
+  summarise( unique_instructors = n_distinct(teacher_id),
+    unique_courses = n_distinct(course_id)) #count number of unique teachers and courses
 
 ```
+> There are 297 unique instructors and 939 courses.
 
 **7. One teacher-course combination has some missing values, coded as `NA`. Which instructor has these missing values? Which course? What variable are the missing values in?**
 
 ```{r}
 #| label: uncovering-missing-values
-# code chunk for Q6
+
+teacher_evals_clean %>%
+  filter(if_any(everything(), is.na))  # filter for rows with na values
 
 ```
+> Instructor 56347 in class PAB3SE004PA had missing values in the percent failed column. 
 
 **8. What are the demographics of the instructors in this study? Investigate the variables `academic_degree`, `seniority`, and `sex` and summarize your findings in ~3 complete sentences.**
 

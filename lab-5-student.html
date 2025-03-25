@@ -3350,7 +3350,7 @@ $ gender                  &lt;chr&gt; &quot;male&quot;, &quot;male&quot;, &quot;
 </div>
 </div>
 <blockquote class="blockquote">
-<p>Most instructors in this dataset have a PhD (~4000 teachers) or a Masters (~2000 teachers), though there are a few (~500) with no degree, and the fewest ctegory are full professors. There is a roughly even amount of male and female instructors across all degree and senority categories, except there seem to be no female professors represented. There is a roughly equal distribution if senority levels (1-11), except for the most common level being 2.</p>
+<p>Most instructors in this dataset have a PhD (~4000 teachers) or a Masters (~2000 teachers), though there are a few (~500) with no degree, and the fewest category are professional degrees. There is a roughly even amount of male and female instructors across all degree and senority categories, except there seem to be no females with professional degrees represented. There is a roughly equal distribution if senority levels (1-11), except for the most common level being 2.</p>
 </blockquote>
 <p><strong>9. Each course seems to have used a different subset of the nine evaluation questions. How many teacher-course combinations asked all nine questions?</strong></p>
 <div class="cell">
@@ -3439,12 +3439,33 @@ $ gender                  &lt;chr&gt; &quot;male&quot;, &quot;male&quot;, &quot;
 </div>
 </div>
 <blockquote class="blockquote">
-<p>instructor 102379 had the lowest fail rate (0%) in that semester and 106692 had the highest (.68%).</p>
+<p>Instructor 102379 had the lowest fail rate (0%) in that semester and 106692 had the highest (.68%).</p>
 </blockquote>
 <p><strong>12. Which female instructors with either a doctorate or professional degree had the highest and lowest average percent of students responding to the evaluation across all their courses?</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># code chunk for Q11</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>teacher_evals_clean <span class="sc">|&gt;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sex <span class="sc">==</span> <span class="st">&quot;female&quot;</span>, </span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>         (academic_degree <span class="sc">==</span> <span class="st">&quot;dr&quot;</span> <span class="sc">|</span> academic_degree <span class="sc">==</span> <span class="st">&quot;prof&quot;</span>)) <span class="sc">|&gt;</span> <span class="co">#filter for females with doctorates and prof degrees</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(teacher_id) <span class="sc">|&gt;</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_resp_share =</span> <span class="fu">mean</span>(resp_share, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co">#calculate the mean % of students who responded for each teacher across all courses</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_resp_teacher =</span> teacher_id[<span class="fu">which.min</span>(avg_resp_share)],</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_resp_teacher =</span> teacher_id[<span class="fu">which.max</span>(avg_resp_share)],</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_resp =</span> <span class="fu">min</span>(avg_resp_share), <span class="co">#print the minimum number responses</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_resp =</span> <span class="fu">max</span>(avg_resp_share)) <span class="co">#print the maximum number responses</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 4
+  min_resp_teacher max_resp_teacher min_resp max_resp
+  &lt;chr&gt;            &lt;chr&gt;               &lt;dbl&gt;    &lt;dbl&gt;
+1 59338            101508             0.0148    0.522</code></pre>
 </div>
+</div>
+<blockquote class="blockquote">
+<p>Female instructor 59338 had the lowest response rate, and instructor 101508 had the highest.</p>
+</blockquote>
 <!-- -->
 
 </section>
@@ -3912,324 +3933,337 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
 });
 </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
-<div class="sourceCode" id="cb27" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &quot;Lab-5-Alyssa-Walter&quot;</span></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> Alyssa Walter</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> 3/21/25</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html </span></span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="an">editor:</span><span class="co"> source</span></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="an">embed-resources:</span><span class="co"> true</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="an">code-tools:</span><span class="co"> true</span></span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="an">execute:</span><span class="co"> </span></span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co">  echo: true</span></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="co">  error: true</span></span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>In this lab, we will be using the <span class="in">`dplyr`</span> package to explore student evaluations</span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>of teaching data. </span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>**You are expected to use functions from `dplyr` to do your data manipulation!**</span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a><span class="fu"># Part 1: GitHub Workflow</span></span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>Now that you have the Lab 5 repository cloned, you need to make sure you can </span>
-<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>successfully push to GitHub. To do this you need to:</span>
-<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Open the <span class="in">`lab-5-student.qmd`</span> file (in the lower right hand corner). </span>
-<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Change the <span class="in">`author`</span> line at the top of the document (in the YAML) to your</span>
-<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>name. </span>
-<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Save your file either by clicking on the blue floppy disk or with a shortcut</span>
-<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>(command / control + s). </span>
-<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Click the &quot;Git&quot; tab in upper right pane</span>
-<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Check the &quot;Staged&quot; box for the <span class="in">`lab-5-student.qmd`</span> file (the file you</span>
-<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>changed)</span>
-<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Click &quot;Commit&quot;</span>
-<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>In the box that opens, type a message in &quot;Commit message&quot;, such as</span>
-<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>&quot;Added my name&quot;.</span>
-<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Click &quot;Commit&quot;.</span>
-<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Click the green &quot;Push&quot; button to send your local changes to GitHub.</span>
-<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>RStudio will display something like:</span>
-<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a><span class="in">```         </span></span>
-<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a><span class="in">&gt;&gt;&gt; /usr/bin/git push origin HEAD:refs/heads/main</span></span>
-<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a><span class="in">To https://github.com/atheobold/introduction-to-quarto-allison-theobold.git</span></span>
-<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a><span class="in">   3a2171f..6d58539  HEAD -&gt; main</span></span>
-<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb27-44"><a href="#cb27-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-45"><a href="#cb27-45" aria-hidden="true" tabindex="-1"></a>Now you are ready to go! Remember, as you are going through the lab I would </span>
-<span id="cb27-46"><a href="#cb27-46" aria-hidden="true" tabindex="-1"></a>strongly recommend rendering your HTML and committing your after **every** </span>
-<span id="cb27-47"><a href="#cb27-47" aria-hidden="true" tabindex="-1"></a>question! </span>
-<span id="cb27-48"><a href="#cb27-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-49"><a href="#cb27-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-50"><a href="#cb27-50" aria-hidden="true" tabindex="-1"></a><span class="fu"># Part 2: Some Words of Advice</span></span>
-<span id="cb27-51"><a href="#cb27-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-52"><a href="#cb27-52" aria-hidden="true" tabindex="-1"></a>Part of learning to program is learning from a variety of resources. Thus, I</span>
-<span id="cb27-53"><a href="#cb27-53" aria-hidden="true" tabindex="-1"></a>expect you will use resources that you find on the internet. There is, however,</span>
-<span id="cb27-54"><a href="#cb27-54" aria-hidden="true" tabindex="-1"></a>an important balance between copying someone else&#39;s code and *using their code to learn*.  </span>
-<span id="cb27-55"><a href="#cb27-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-56"><a href="#cb27-56" aria-hidden="true" tabindex="-1"></a>Therefore, if you use external resources, I want to know about it.</span>
-<span id="cb27-57"><a href="#cb27-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-58"><a href="#cb27-58" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>If you used Google, you are expected to &quot;inform&quot; me of any resources you</span>
-<span id="cb27-59"><a href="#cb27-59" aria-hidden="true" tabindex="-1"></a>used by **pasting the link to the resource in a code comment next to where you used that resource**.</span>
-<span id="cb27-60"><a href="#cb27-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-61"><a href="#cb27-61" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>If you used ChatGPT, you are expected to &quot;inform&quot; me of the assistance you</span>
-<span id="cb27-62"><a href="#cb27-62" aria-hidden="true" tabindex="-1"></a>received by (1) indicating somewhere in the problem that you used ChatGPT </span>
-<span id="cb27-63"><a href="#cb27-63" aria-hidden="true" tabindex="-1"></a>(e.g., below the question prompt or as a code comment), and (2) downloading and</span>
-<span id="cb27-64"><a href="#cb27-64" aria-hidden="true" tabindex="-1"></a>including the <span class="in">`.txt`</span> file containing your **entire** conversation with ChatGPT.</span>
-<span id="cb27-65"><a href="#cb27-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-66"><a href="#cb27-66" aria-hidden="true" tabindex="-1"></a>Additionally, you are permitted and encouraged to work with your peers as you</span>
-<span id="cb27-67"><a href="#cb27-67" aria-hidden="true" tabindex="-1"></a>complete lab assignments, but **you are expected to do your own work**. Copying</span>
-<span id="cb27-68"><a href="#cb27-68" aria-hidden="true" tabindex="-1"></a>from each other is cheating, and letting people copy from you is also cheating.</span>
-<span id="cb27-69"><a href="#cb27-69" aria-hidden="true" tabindex="-1"></a>Please don&#39;t do either of those things.</span>
-<span id="cb27-70"><a href="#cb27-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-71"><a href="#cb27-71" aria-hidden="true" tabindex="-1"></a><span class="fu">## Setting Up Your Code Chunks</span></span>
-<span id="cb27-72"><a href="#cb27-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-73"><a href="#cb27-73" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>The first chunk of this Quarto document should be used to *declare your libraries* (probably only <span class="in">`tidyverse`</span> for now).</span>
-<span id="cb27-74"><a href="#cb27-74" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>The second chunk of your Quarto document should be to *load in your data*.</span>
-<span id="cb27-75"><a href="#cb27-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-76"><a href="#cb27-76" aria-hidden="true" tabindex="-1"></a><span class="fu">## Save Regularly, Render Often</span></span>
-<span id="cb27-77"><a href="#cb27-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-78"><a href="#cb27-78" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Be sure to **save** your work regularly.</span>
-<span id="cb27-79"><a href="#cb27-79" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Be sure to **render** your file every so often, to check for errors and make</span>
-<span id="cb27-80"><a href="#cb27-80" aria-hidden="true" tabindex="-1"></a>sure it looks nice.</span>
-<span id="cb27-81"><a href="#cb27-81" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>Make sure your Quarto document does not contain <span class="in">`View(dataset)`</span> or <span class="in">`install.packages(&quot;package&quot;)`</span>, both of these will prevent rendering.</span>
-<span id="cb27-82"><a href="#cb27-82" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>Check your Quarto document for occasions when you looked at the data by</span>
-<span id="cb27-83"><a href="#cb27-83" aria-hidden="true" tabindex="-1"></a>    typing the name of the data frame. Leaving these in means the whole dataset</span>
-<span id="cb27-84"><a href="#cb27-84" aria-hidden="true" tabindex="-1"></a>    will print out and this looks unprofessional. **Remove these!**</span>
-<span id="cb27-85"><a href="#cb27-85" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>If all else fails, you can set your execution options to <span class="in">`error: true`</span>,</span>
-<span id="cb27-86"><a href="#cb27-86" aria-hidden="true" tabindex="-1"></a>    which will allow the file to render even if errors are present.</span>
-<span id="cb27-87"><a href="#cb27-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-88"><a href="#cb27-88" aria-hidden="true" tabindex="-1"></a><span class="fu"># Part 3: Let&#39;s Start Working with the Data!</span></span>
-<span id="cb27-89"><a href="#cb27-89" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-90"><a href="#cb27-90" aria-hidden="true" tabindex="-1"></a><span class="fu">## The Data</span></span>
-<span id="cb27-91"><a href="#cb27-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-92"><a href="#cb27-92" aria-hidden="true" tabindex="-1"></a>The <span class="in">`teacher_evals`</span> dataset contains student evaluations of teaching (SET)</span>
-<span id="cb27-93"><a href="#cb27-93" aria-hidden="true" tabindex="-1"></a>collected from students at a University in Poland. There are SET surveys from </span>
-<span id="cb27-94"><a href="#cb27-94" aria-hidden="true" tabindex="-1"></a>students in all fields and all levels of study offered by the university.</span>
-<span id="cb27-95"><a href="#cb27-95" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-96"><a href="#cb27-96" aria-hidden="true" tabindex="-1"></a>The SET questionnaire that every student at this university completes is as</span>
-<span id="cb27-97"><a href="#cb27-97" aria-hidden="true" tabindex="-1"></a>follows:</span>
-<span id="cb27-98"><a href="#cb27-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-99"><a href="#cb27-99" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Evaluation survey of the teaching staff of University of Poland. Please</span></span>
-<span id="cb27-100"><a href="#cb27-100" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; complete the following evaluation form, which aims to assess the lecturer’s</span></span>
-<span id="cb27-101"><a href="#cb27-101" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; performance. Only one answer should be indicated for each question. The</span></span>
-<span id="cb27-102"><a href="#cb27-102" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; answers are coded in the following way: 5 - I strongly agree; 4 - I agree;</span></span>
-<span id="cb27-103"><a href="#cb27-103" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; 3 - Neutral; 2 - I don’t agree; 1 - I strongly don’t agree.</span></span>
-<span id="cb27-104"><a href="#cb27-104" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
-<span id="cb27-105"><a href="#cb27-105" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 1: I learned a lot during the course.</span></span>
-<span id="cb27-106"><a href="#cb27-106" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
-<span id="cb27-107"><a href="#cb27-107" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 2: I think that the knowledge acquired during the course is very</span></span>
-<span id="cb27-108"><a href="#cb27-108" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; useful.</span></span>
-<span id="cb27-109"><a href="#cb27-109" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
-<span id="cb27-110"><a href="#cb27-110" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 3: The professor used activities to make the class more engaging.</span></span>
-<span id="cb27-111"><a href="#cb27-111" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
-<span id="cb27-112"><a href="#cb27-112" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 4: If it was possible, I would enroll for a course conducted by this</span></span>
-<span id="cb27-113"><a href="#cb27-113" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; lecturer again.</span></span>
-<span id="cb27-114"><a href="#cb27-114" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
-<span id="cb27-115"><a href="#cb27-115" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 5: The classes started on time.</span></span>
-<span id="cb27-116"><a href="#cb27-116" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
-<span id="cb27-117"><a href="#cb27-117" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 6: The lecturer always used time efficiently.</span></span>
-<span id="cb27-118"><a href="#cb27-118" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
-<span id="cb27-119"><a href="#cb27-119" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 7: The lecturer delivered the class content in an understandable and</span></span>
-<span id="cb27-120"><a href="#cb27-120" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; efficient way.</span></span>
-<span id="cb27-121"><a href="#cb27-121" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
-<span id="cb27-122"><a href="#cb27-122" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 8: The lecturer was available when we had doubts.</span></span>
-<span id="cb27-123"><a href="#cb27-123" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
-<span id="cb27-124"><a href="#cb27-124" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 9. The lecturer treated all students equally regardless of their</span></span>
-<span id="cb27-125"><a href="#cb27-125" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; race, background and ethnicity.</span></span>
-<span id="cb27-126"><a href="#cb27-126" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-127"><a href="#cb27-127" aria-hidden="true" tabindex="-1"></a>These data are from the end of the winter semester of the 2020-2021 academic</span>
-<span id="cb27-128"><a href="#cb27-128" aria-hidden="true" tabindex="-1"></a>year. In the period of data collection, all university classes were entirely</span>
-<span id="cb27-129"><a href="#cb27-129" aria-hidden="true" tabindex="-1"></a>online amid the COVID-19 pandemic. While expected learning outcomes were not</span>
-<span id="cb27-130"><a href="#cb27-130" aria-hidden="true" tabindex="-1"></a>changed, the online mode of study could have affected grading policies and could</span>
-<span id="cb27-131"><a href="#cb27-131" aria-hidden="true" tabindex="-1"></a>have implications for data.</span>
-<span id="cb27-132"><a href="#cb27-132" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-133"><a href="#cb27-133" aria-hidden="true" tabindex="-1"></a>**Average SET scores** were combined with many other variables, including:</span>
-<span id="cb27-134"><a href="#cb27-134" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-135"><a href="#cb27-135" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>**characteristics of the teacher** (degree, seniority, gender, SET scores in</span>
-<span id="cb27-136"><a href="#cb27-136" aria-hidden="true" tabindex="-1"></a>the past 6 semesters).</span>
-<span id="cb27-137"><a href="#cb27-137" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>**characteristics of the course** (time of day, day of the week, course</span>
-<span id="cb27-138"><a href="#cb27-138" aria-hidden="true" tabindex="-1"></a>type, course breadth, class duration, class size).</span>
-<span id="cb27-139"><a href="#cb27-139" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>**percentage of students providing SET feedback.**</span>
-<span id="cb27-140"><a href="#cb27-140" aria-hidden="true" tabindex="-1"></a><span class="ss">4.  </span>**course grades** (mean, standard deviation, percentage failed for the</span>
-<span id="cb27-141"><a href="#cb27-141" aria-hidden="true" tabindex="-1"></a>current course and previous 6 semesters).</span>
-<span id="cb27-142"><a href="#cb27-142" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-143"><a href="#cb27-143" aria-hidden="true" tabindex="-1"></a>This rich dataset allows us to **investigate many of the biases in student evaluations of teaching** that have been reported in the literature and to formulate new</span>
-<span id="cb27-144"><a href="#cb27-144" aria-hidden="true" tabindex="-1"></a>hypotheses.</span>
-<span id="cb27-145"><a href="#cb27-145" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-146"><a href="#cb27-146" aria-hidden="true" tabindex="-1"></a>Before tackling the problems below, study the description of each variable</span>
-<span id="cb27-147"><a href="#cb27-147" aria-hidden="true" tabindex="-1"></a>included in the <span class="in">`teacher_evals_codebook.pdf`</span>.</span>
-<span id="cb27-148"><a href="#cb27-148" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-149"><a href="#cb27-149" aria-hidden="true" tabindex="-1"></a>**1. Load the appropriate R packages for your analysis.**</span>
-<span id="cb27-150"><a href="#cb27-150" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-153"><a href="#cb27-153" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb27-154"><a href="#cb27-154" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: setup</span></span>
-<span id="cb27-155"><a href="#cb27-155" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb27-156"><a href="#cb27-156" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-157"><a href="#cb27-157" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb27-158"><a href="#cb27-158" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-159"><a href="#cb27-159" aria-hidden="true" tabindex="-1"></a>**2. Load in the `teacher_evals` data.** </span>
-<span id="cb27-160"><a href="#cb27-160" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-163"><a href="#cb27-163" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb27-164"><a href="#cb27-164" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: load-data</span></span>
-<span id="cb27-165"><a href="#cb27-165" aria-hidden="true" tabindex="-1"></a>teacher_evals<span class="ot">&lt;-</span><span class="fu">read.csv</span>(<span class="st">&quot;data-raw/teacher_evals.csv&quot;</span>)</span>
-<span id="cb27-166"><a href="#cb27-166" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-167"><a href="#cb27-167" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb27-168"><a href="#cb27-168" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-169"><a href="#cb27-169" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Inspection + Summary</span></span>
-<span id="cb27-170"><a href="#cb27-170" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-171"><a href="#cb27-171" aria-hidden="true" tabindex="-1"></a>**3. Provide a brief overview (~4 sentences) of the dataset.**</span>
-<span id="cb27-172"><a href="#cb27-172" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-175"><a href="#cb27-175" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb27-176"><a href="#cb27-176" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: explore-data</span></span>
-<span id="cb27-177"><a href="#cb27-177" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(teacher_evals)</span>
-<span id="cb27-178"><a href="#cb27-178" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(teacher_evals)</span>
-<span id="cb27-179"><a href="#cb27-179" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb27-180"><a href="#cb27-180" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; This dataset includes student evaluations of their teachers, and information about the teacher&#39;s educational experience and gender. Student grades and class averages are also represented in the dataset, so we have the ability to compare student performance to teacher experience level. Class time and day of the week are also variables included in the student evaluations, so we can expore whether there is any relationship between class time and student performance.</span></span>
-<span id="cb27-181"><a href="#cb27-181" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-182"><a href="#cb27-182" aria-hidden="true" tabindex="-1"></a>**4. What is the unit of observation (i.e. a single row in the dataset) identified by?**</span>
-<span id="cb27-183"><a href="#cb27-183" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-186"><a href="#cb27-186" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb27-187"><a href="#cb27-187" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: row-identification</span></span>
-<span id="cb27-188"><a href="#cb27-188" aria-hidden="true" tabindex="-1"></a><span class="co"># you may want to use code to answer this question</span></span>
-<span id="cb27-189"><a href="#cb27-189" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-190"><a href="#cb27-190" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb27-191"><a href="#cb27-191" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; The unit of observation is each question on the student evaluation. Each row in the dataset is the class average of student results for a single question and teacher of a class.</span></span>
-<span id="cb27-192"><a href="#cb27-192" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-193"><a href="#cb27-193" aria-hidden="true" tabindex="-1"></a>**5. Use _one_ `dplyr` pipeline to clean the data by:**</span>
-<span id="cb27-194"><a href="#cb27-194" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-195"><a href="#cb27-195" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**renaming the `gender` variable `sex`**</span>
-<span id="cb27-196"><a href="#cb27-196" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**removing all courses with fewer than 10 respondents**</span>
-<span id="cb27-197"><a href="#cb27-197" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**changing data types in whichever way you see fit (e.g., is the instructor ID really a numeric data type?)**</span>
-<span id="cb27-198"><a href="#cb27-198" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**only keeping the columns we will use -- `course_id`, `teacher_id`, `question_no`, `no_participants`, `resp_share`, `SET_score_avg`, `percent_failed_cur`, `academic_degree`, `seniority`, and `sex`**</span>
-<span id="cb27-199"><a href="#cb27-199" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-200"><a href="#cb27-200" aria-hidden="true" tabindex="-1"></a>**Assign your cleaned data to a new variable named `teacher_evals_clean` –- use these data going forward. Save the data as `teacher_evals_clean.csv` in the `data-clean` folder.**</span>
-<span id="cb27-201"><a href="#cb27-201" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-204"><a href="#cb27-204" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb27-205"><a href="#cb27-205" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: data-cleaning</span></span>
-<span id="cb27-206"><a href="#cb27-206" aria-hidden="true" tabindex="-1"></a>teacher_evals_clean <span class="ot">&lt;-</span> teacher_evals<span class="sc">|&gt;</span></span>
-<span id="cb27-207"><a href="#cb27-207" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">sex =</span> gender) <span class="sc">|&gt;</span> <span class="co">#rename gender as sex</span></span>
-<span id="cb27-208"><a href="#cb27-208" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(no_participants <span class="sc">&gt;=</span> <span class="dv">10</span>) <span class="sc">|&gt;</span> <span class="co">#select only classes with 10 or more students</span></span>
-<span id="cb27-209"><a href="#cb27-209" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb27-210"><a href="#cb27-210" aria-hidden="true" tabindex="-1"></a>    <span class="at">teacher_id =</span> <span class="fu">as.character</span>(teacher_id),  <span class="co">#change teacher_id to a character</span></span>
-<span id="cb27-211"><a href="#cb27-211" aria-hidden="true" tabindex="-1"></a>    <span class="at">question_no =</span> <span class="fu">as.character</span>(question_no) <span class="co">#change question_no to a character</span></span>
-<span id="cb27-212"><a href="#cb27-212" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb27-213"><a href="#cb27-213" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(course_id, teacher_id, question_no, no_participants, resp_share, </span>
-<span id="cb27-214"><a href="#cb27-214" aria-hidden="true" tabindex="-1"></a>         SET_score_avg, percent_failed_cur, academic_degree, seniority, sex) <span class="sc">|&gt;</span> <span class="co">#keeping only the columns we want </span></span>
-<span id="cb27-215"><a href="#cb27-215" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_csv</span>(<span class="st">&quot;data-clean/teacher_evals_clean.csv&quot;</span>) <span class="co">#saving clean data</span></span>
-<span id="cb27-216"><a href="#cb27-216" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-217"><a href="#cb27-217" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-218"><a href="#cb27-218" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb27-219"><a href="#cb27-219" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-220"><a href="#cb27-220" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-221"><a href="#cb27-221" aria-hidden="true" tabindex="-1"></a>**6. How many unique instructors and unique courses are present in the cleaned dataset?**</span>
-<span id="cb27-222"><a href="#cb27-222" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-225"><a href="#cb27-225" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb27-226"><a href="#cb27-226" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: unique-courses</span></span>
-<span id="cb27-227"><a href="#cb27-227" aria-hidden="true" tabindex="-1"></a>teacher_evals_clean<span class="sc">|&gt;</span></span>
-<span id="cb27-228"><a href="#cb27-228" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>( <span class="at">unique_instructors =</span> <span class="fu">n_distinct</span>(teacher_id),</span>
-<span id="cb27-229"><a href="#cb27-229" aria-hidden="true" tabindex="-1"></a>    <span class="at">unique_courses =</span> <span class="fu">n_distinct</span>(course_id)) <span class="co">#count number of unique teachers and courses</span></span>
-<span id="cb27-230"><a href="#cb27-230" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-231"><a href="#cb27-231" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb27-232"><a href="#cb27-232" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; There are 297 unique instructors and 939 courses.</span></span>
-<span id="cb27-233"><a href="#cb27-233" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-234"><a href="#cb27-234" aria-hidden="true" tabindex="-1"></a>**7. One teacher-course combination has some missing values, coded as `NA`. Which instructor has these missing values? Which course? What variable are the missing values in?**</span>
-<span id="cb27-235"><a href="#cb27-235" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-238"><a href="#cb27-238" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb27-239"><a href="#cb27-239" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: uncovering-missing-values</span></span>
-<span id="cb27-240"><a href="#cb27-240" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-241"><a href="#cb27-241" aria-hidden="true" tabindex="-1"></a>teacher_evals_clean<span class="sc">|&gt;</span></span>
-<span id="cb27-242"><a href="#cb27-242" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">if_any</span>(<span class="fu">everything</span>(), is.na))  <span class="co"># filter for rows with na values</span></span>
-<span id="cb27-243"><a href="#cb27-243" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-244"><a href="#cb27-244" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb27-245"><a href="#cb27-245" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Instructor 56347 in class PAB3SE004PA had missing values in the percent failed column. </span></span>
-<span id="cb27-246"><a href="#cb27-246" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-247"><a href="#cb27-247" aria-hidden="true" tabindex="-1"></a>**8. What are the demographics of the instructors in this study? Investigate the variables `academic_degree`, `seniority`, and `sex` and summarize your findings in ~3 complete sentences.**</span>
-<span id="cb27-248"><a href="#cb27-248" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-251"><a href="#cb27-251" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb27-252"><a href="#cb27-252" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: exploring-demographics-of-instructors</span></span>
-<span id="cb27-253"><a href="#cb27-253" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-254"><a href="#cb27-254" aria-hidden="true" tabindex="-1"></a><span class="co"># degree barplot</span></span>
-<span id="cb27-255"><a href="#cb27-255" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(teacher_evals_clean, <span class="fu">aes</span>(<span class="at">x =</span> academic_degree, <span class="at">fill =</span> sex)) <span class="sc">+</span></span>
-<span id="cb27-256"><a href="#cb27-256" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">&quot;stack&quot;</span>) <span class="sc">+</span></span>
-<span id="cb27-257"><a href="#cb27-257" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Academic Degree of Teachers by Sex&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Academic Degree&quot;</span>, <span class="at">y =</span> <span class="st">&quot;# of Teachers&quot;</span>) <span class="sc">+</span></span>
-<span id="cb27-258"><a href="#cb27-258" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
-<span id="cb27-259"><a href="#cb27-259" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-260"><a href="#cb27-260" aria-hidden="true" tabindex="-1"></a><span class="co"># seniority barplot</span></span>
-<span id="cb27-261"><a href="#cb27-261" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(teacher_evals_clean, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(seniority), <span class="at">fill =</span> sex)) <span class="sc">+</span></span>
-<span id="cb27-262"><a href="#cb27-262" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">&quot;stack&quot;</span>) <span class="sc">+</span></span>
-<span id="cb27-263"><a href="#cb27-263" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Seniority of Teachers by Sex&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Seniority&quot;</span>, <span class="at">y =</span> <span class="st">&quot;# of Teachers&quot;</span>) <span class="sc">+</span></span>
-<span id="cb27-264"><a href="#cb27-264" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
-<span id="cb27-265"><a href="#cb27-265" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-266"><a href="#cb27-266" aria-hidden="true" tabindex="-1"></a><span class="co"># sex of teachers barplot</span></span>
-<span id="cb27-267"><a href="#cb27-267" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(teacher_evals_clean, <span class="fu">aes</span>(<span class="at">x =</span> sex)) <span class="sc">+</span></span>
-<span id="cb27-268"><a href="#cb27-268" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">fill =</span> <span class="st">&quot;indianred1&quot;</span>) <span class="sc">+</span></span>
-<span id="cb27-269"><a href="#cb27-269" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Sex of Teachers&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Sex&quot;</span>, <span class="at">y =</span> <span class="st">&quot;# of Teachers&quot;</span>) <span class="sc">+</span></span>
-<span id="cb27-270"><a href="#cb27-270" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
-<span id="cb27-271"><a href="#cb27-271" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-272"><a href="#cb27-272" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb27-273"><a href="#cb27-273" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Most instructors in this dataset have a PhD (~4000 teachers) or a Masters (~2000 teachers), though there are a few (~500) with no degree, and the fewest ctegory are full professors. There is a roughly even amount of male and female instructors across all degree and senority categories, except there seem to be no female professors represented. There is a roughly equal distribution if senority levels (1-11), except for the most common level being 2.</span></span>
-<span id="cb27-274"><a href="#cb27-274" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-275"><a href="#cb27-275" aria-hidden="true" tabindex="-1"></a>**9. Each course seems to have used a different subset of the nine evaluation questions. How many teacher-course combinations asked all nine questions?**</span>
-<span id="cb27-276"><a href="#cb27-276" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-279"><a href="#cb27-279" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb27-280"><a href="#cb27-280" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: teacher-course-asked-every-question</span></span>
-<span id="cb27-281"><a href="#cb27-281" aria-hidden="true" tabindex="-1"></a>teacher_evals_clean<span class="sc">|&gt;</span></span>
-<span id="cb27-282"><a href="#cb27-282" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(course_id, teacher_id)<span class="sc">|&gt;</span> <span class="co">#group by teacher and course</span></span>
-<span id="cb27-283"><a href="#cb27-283" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">unique_questions =</span> <span class="fu">n_distinct</span>(question_no)) <span class="sc">|&gt;</span> <span class="co">#find the number of questions asked in each course</span></span>
-<span id="cb27-284"><a href="#cb27-284" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(unique_questions <span class="sc">==</span> <span class="dv">9</span>) <span class="co">#select courses who asked all 9 questions</span></span>
-<span id="cb27-285"><a href="#cb27-285" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb27-286"><a href="#cb27-286" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; There are 49 teacher-course combinations who asked all 9 questions</span></span>
-<span id="cb27-287"><a href="#cb27-287" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-288"><a href="#cb27-288" aria-hidden="true" tabindex="-1"></a><span class="fu">## Rate my Professor</span></span>
-<span id="cb27-289"><a href="#cb27-289" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-290"><a href="#cb27-290" aria-hidden="true" tabindex="-1"></a>**10. Which instructors had the highest and lowest average rating for Question 1 (I learnt a lot during the course.) across all their courses?**</span>
-<span id="cb27-291"><a href="#cb27-291" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-294"><a href="#cb27-294" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb27-295"><a href="#cb27-295" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: question-1-high-low</span></span>
-<span id="cb27-296"><a href="#cb27-296" aria-hidden="true" tabindex="-1"></a>teacher_evals_clean<span class="sc">|&gt;</span></span>
-<span id="cb27-297"><a href="#cb27-297" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(question_no <span class="sc">==</span> <span class="dv">901</span>)<span class="sc">|&gt;</span> <span class="co">#filter for question 1</span></span>
-<span id="cb27-298"><a href="#cb27-298" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(teacher_id, course_id) <span class="sc">|&gt;</span> <span class="co">#group by teacher and course</span></span>
-<span id="cb27-299"><a href="#cb27-299" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">avg_rating =</span> <span class="fu">mean</span>(SET_score_avg, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> <span class="co">#average scores for each teacher across their courses</span></span>
-<span id="cb27-300"><a href="#cb27-300" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb27-301"><a href="#cb27-301" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb27-302"><a href="#cb27-302" aria-hidden="true" tabindex="-1"></a>    <span class="at">highest_teacher =</span> teacher_id[<span class="fu">which.max</span>(avg_rating)], </span>
-<span id="cb27-303"><a href="#cb27-303" aria-hidden="true" tabindex="-1"></a>    <span class="at">lowest_teacher =</span> teacher_id[<span class="fu">which.min</span>(avg_rating)],</span>
-<span id="cb27-304"><a href="#cb27-304" aria-hidden="true" tabindex="-1"></a>    <span class="at">highest_rating =</span> <span class="fu">max</span>(avg_rating),</span>
-<span id="cb27-305"><a href="#cb27-305" aria-hidden="true" tabindex="-1"></a>    <span class="at">lowest_rating =</span> <span class="fu">min</span>(avg_rating))</span>
-<span id="cb27-306"><a href="#cb27-306" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-307"><a href="#cb27-307" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb27-308"><a href="#cb27-308" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; 100131 had the highest average SET score and 100132 had the lowest. </span></span>
-<span id="cb27-309"><a href="#cb27-309" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-310"><a href="#cb27-310" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; I recieved help with which. functions from https://r-coder.com/which-max-min-r/</span></span>
-<span id="cb27-311"><a href="#cb27-311" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-312"><a href="#cb27-312" aria-hidden="true" tabindex="-1"></a>**11. Which instructors with one year of experience had the highest and lowest average percentage of students failing in the current semester across all their courses?**</span>
-<span id="cb27-313"><a href="#cb27-313" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-316"><a href="#cb27-316" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb27-317"><a href="#cb27-317" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: one-year-experience-failing-students</span></span>
-<span id="cb27-318"><a href="#cb27-318" aria-hidden="true" tabindex="-1"></a>teacher_evals_clean <span class="sc">|&gt;</span></span>
-<span id="cb27-319"><a href="#cb27-319" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(seniority <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> <span class="co">#filter for a seniority level of 1</span></span>
-<span id="cb27-320"><a href="#cb27-320" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(teacher_id) <span class="sc">|&gt;</span></span>
-<span id="cb27-321"><a href="#cb27-321" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
-<span id="cb27-322"><a href="#cb27-322" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_fail_percent =</span> <span class="fu">mean</span>(percent_failed_cur, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb27-323"><a href="#cb27-323" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> <span class="co">#average fail rate across all the teachers classes</span></span>
-<span id="cb27-324"><a href="#cb27-324" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb27-325"><a href="#cb27-325" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb27-326"><a href="#cb27-326" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_fail_teacher =</span> teacher_id[<span class="fu">which.min</span>(avg_fail_percent)],<span class="co"># find the min fail rate</span></span>
-<span id="cb27-327"><a href="#cb27-327" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_fail_teacher =</span> teacher_id[<span class="fu">which.max</span>(avg_fail_percent)],<span class="co"># find the max fail rate</span></span>
-<span id="cb27-328"><a href="#cb27-328" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_fail =</span> <span class="fu">min</span>(avg_fail_percent),</span>
-<span id="cb27-329"><a href="#cb27-329" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_fail =</span> <span class="fu">max</span>(avg_fail_percent)</span>
-<span id="cb27-330"><a href="#cb27-330" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb27-331"><a href="#cb27-331" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb27-332"><a href="#cb27-332" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; instructor 102379 had the lowest fail rate (0%) in that semester and 106692 had the highest (.68%).</span></span>
-<span id="cb27-333"><a href="#cb27-333" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-334"><a href="#cb27-334" aria-hidden="true" tabindex="-1"></a>**12. Which female instructors with either a doctorate or professional degree had the highest and lowest average percent of students responding to the evaluation across all their courses?**</span>
-<span id="cb27-335"><a href="#cb27-335" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-338"><a href="#cb27-338" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb27-339"><a href="#cb27-339" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: female-instructor-student-response</span></span>
-<span id="cb27-340"><a href="#cb27-340" aria-hidden="true" tabindex="-1"></a><span class="co"># code chunk for Q11</span></span>
-<span id="cb27-341"><a href="#cb27-341" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-342"><a href="#cb27-342" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<div class="sourceCode" id="cb28" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &quot;Lab-5-Alyssa-Walter&quot;</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> Alyssa Walter</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> 3/21/25</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html </span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="an">editor:</span><span class="co"> source</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="an">embed-resources:</span><span class="co"> true</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="an">code-tools:</span><span class="co"> true</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="an">execute:</span><span class="co"> </span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co">  echo: true</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="co">  error: true</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>In this lab, we will be using the <span class="in">`dplyr`</span> package to explore student evaluations</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>of teaching data. </span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>**You are expected to use functions from `dplyr` to do your data manipulation!**</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="fu"># Part 1: GitHub Workflow</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>Now that you have the Lab 5 repository cloned, you need to make sure you can </span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>successfully push to GitHub. To do this you need to:</span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Open the <span class="in">`lab-5-student.qmd`</span> file (in the lower right hand corner). </span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Change the <span class="in">`author`</span> line at the top of the document (in the YAML) to your</span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>name. </span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Save your file either by clicking on the blue floppy disk or with a shortcut</span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>(command / control + s). </span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Click the &quot;Git&quot; tab in upper right pane</span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Check the &quot;Staged&quot; box for the <span class="in">`lab-5-student.qmd`</span> file (the file you</span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>changed)</span>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Click &quot;Commit&quot;</span>
+<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>In the box that opens, type a message in &quot;Commit message&quot;, such as</span>
+<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a>&quot;Added my name&quot;.</span>
+<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Click &quot;Commit&quot;.</span>
+<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Click the green &quot;Push&quot; button to send your local changes to GitHub.</span>
+<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a>RStudio will display something like:</span>
+<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a><span class="in">```         </span></span>
+<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a><span class="in">&gt;&gt;&gt; /usr/bin/git push origin HEAD:refs/heads/main</span></span>
+<span id="cb28-41"><a href="#cb28-41" aria-hidden="true" tabindex="-1"></a><span class="in">To https://github.com/atheobold/introduction-to-quarto-allison-theobold.git</span></span>
+<span id="cb28-42"><a href="#cb28-42" aria-hidden="true" tabindex="-1"></a><span class="in">   3a2171f..6d58539  HEAD -&gt; main</span></span>
+<span id="cb28-43"><a href="#cb28-43" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-44"><a href="#cb28-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-45"><a href="#cb28-45" aria-hidden="true" tabindex="-1"></a>Now you are ready to go! Remember, as you are going through the lab I would </span>
+<span id="cb28-46"><a href="#cb28-46" aria-hidden="true" tabindex="-1"></a>strongly recommend rendering your HTML and committing your after **every** </span>
+<span id="cb28-47"><a href="#cb28-47" aria-hidden="true" tabindex="-1"></a>question! </span>
+<span id="cb28-48"><a href="#cb28-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-49"><a href="#cb28-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-50"><a href="#cb28-50" aria-hidden="true" tabindex="-1"></a><span class="fu"># Part 2: Some Words of Advice</span></span>
+<span id="cb28-51"><a href="#cb28-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-52"><a href="#cb28-52" aria-hidden="true" tabindex="-1"></a>Part of learning to program is learning from a variety of resources. Thus, I</span>
+<span id="cb28-53"><a href="#cb28-53" aria-hidden="true" tabindex="-1"></a>expect you will use resources that you find on the internet. There is, however,</span>
+<span id="cb28-54"><a href="#cb28-54" aria-hidden="true" tabindex="-1"></a>an important balance between copying someone else&#39;s code and *using their code to learn*.  </span>
+<span id="cb28-55"><a href="#cb28-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-56"><a href="#cb28-56" aria-hidden="true" tabindex="-1"></a>Therefore, if you use external resources, I want to know about it.</span>
+<span id="cb28-57"><a href="#cb28-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-58"><a href="#cb28-58" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>If you used Google, you are expected to &quot;inform&quot; me of any resources you</span>
+<span id="cb28-59"><a href="#cb28-59" aria-hidden="true" tabindex="-1"></a>used by **pasting the link to the resource in a code comment next to where you used that resource**.</span>
+<span id="cb28-60"><a href="#cb28-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-61"><a href="#cb28-61" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>If you used ChatGPT, you are expected to &quot;inform&quot; me of the assistance you</span>
+<span id="cb28-62"><a href="#cb28-62" aria-hidden="true" tabindex="-1"></a>received by (1) indicating somewhere in the problem that you used ChatGPT </span>
+<span id="cb28-63"><a href="#cb28-63" aria-hidden="true" tabindex="-1"></a>(e.g., below the question prompt or as a code comment), and (2) downloading and</span>
+<span id="cb28-64"><a href="#cb28-64" aria-hidden="true" tabindex="-1"></a>including the <span class="in">`.txt`</span> file containing your **entire** conversation with ChatGPT.</span>
+<span id="cb28-65"><a href="#cb28-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-66"><a href="#cb28-66" aria-hidden="true" tabindex="-1"></a>Additionally, you are permitted and encouraged to work with your peers as you</span>
+<span id="cb28-67"><a href="#cb28-67" aria-hidden="true" tabindex="-1"></a>complete lab assignments, but **you are expected to do your own work**. Copying</span>
+<span id="cb28-68"><a href="#cb28-68" aria-hidden="true" tabindex="-1"></a>from each other is cheating, and letting people copy from you is also cheating.</span>
+<span id="cb28-69"><a href="#cb28-69" aria-hidden="true" tabindex="-1"></a>Please don&#39;t do either of those things.</span>
+<span id="cb28-70"><a href="#cb28-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-71"><a href="#cb28-71" aria-hidden="true" tabindex="-1"></a><span class="fu">## Setting Up Your Code Chunks</span></span>
+<span id="cb28-72"><a href="#cb28-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-73"><a href="#cb28-73" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>The first chunk of this Quarto document should be used to *declare your libraries* (probably only <span class="in">`tidyverse`</span> for now).</span>
+<span id="cb28-74"><a href="#cb28-74" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>The second chunk of your Quarto document should be to *load in your data*.</span>
+<span id="cb28-75"><a href="#cb28-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-76"><a href="#cb28-76" aria-hidden="true" tabindex="-1"></a><span class="fu">## Save Regularly, Render Often</span></span>
+<span id="cb28-77"><a href="#cb28-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-78"><a href="#cb28-78" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Be sure to **save** your work regularly.</span>
+<span id="cb28-79"><a href="#cb28-79" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>Be sure to **render** your file every so often, to check for errors and make</span>
+<span id="cb28-80"><a href="#cb28-80" aria-hidden="true" tabindex="-1"></a>sure it looks nice.</span>
+<span id="cb28-81"><a href="#cb28-81" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>Make sure your Quarto document does not contain <span class="in">`View(dataset)`</span> or <span class="in">`install.packages(&quot;package&quot;)`</span>, both of these will prevent rendering.</span>
+<span id="cb28-82"><a href="#cb28-82" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>Check your Quarto document for occasions when you looked at the data by</span>
+<span id="cb28-83"><a href="#cb28-83" aria-hidden="true" tabindex="-1"></a>    typing the name of the data frame. Leaving these in means the whole dataset</span>
+<span id="cb28-84"><a href="#cb28-84" aria-hidden="true" tabindex="-1"></a>    will print out and this looks unprofessional. **Remove these!**</span>
+<span id="cb28-85"><a href="#cb28-85" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>If all else fails, you can set your execution options to <span class="in">`error: true`</span>,</span>
+<span id="cb28-86"><a href="#cb28-86" aria-hidden="true" tabindex="-1"></a>    which will allow the file to render even if errors are present.</span>
+<span id="cb28-87"><a href="#cb28-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-88"><a href="#cb28-88" aria-hidden="true" tabindex="-1"></a><span class="fu"># Part 3: Let&#39;s Start Working with the Data!</span></span>
+<span id="cb28-89"><a href="#cb28-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-90"><a href="#cb28-90" aria-hidden="true" tabindex="-1"></a><span class="fu">## The Data</span></span>
+<span id="cb28-91"><a href="#cb28-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-92"><a href="#cb28-92" aria-hidden="true" tabindex="-1"></a>The <span class="in">`teacher_evals`</span> dataset contains student evaluations of teaching (SET)</span>
+<span id="cb28-93"><a href="#cb28-93" aria-hidden="true" tabindex="-1"></a>collected from students at a University in Poland. There are SET surveys from </span>
+<span id="cb28-94"><a href="#cb28-94" aria-hidden="true" tabindex="-1"></a>students in all fields and all levels of study offered by the university.</span>
+<span id="cb28-95"><a href="#cb28-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-96"><a href="#cb28-96" aria-hidden="true" tabindex="-1"></a>The SET questionnaire that every student at this university completes is as</span>
+<span id="cb28-97"><a href="#cb28-97" aria-hidden="true" tabindex="-1"></a>follows:</span>
+<span id="cb28-98"><a href="#cb28-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-99"><a href="#cb28-99" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Evaluation survey of the teaching staff of University of Poland. Please</span></span>
+<span id="cb28-100"><a href="#cb28-100" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; complete the following evaluation form, which aims to assess the lecturer’s</span></span>
+<span id="cb28-101"><a href="#cb28-101" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; performance. Only one answer should be indicated for each question. The</span></span>
+<span id="cb28-102"><a href="#cb28-102" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; answers are coded in the following way: 5 - I strongly agree; 4 - I agree;</span></span>
+<span id="cb28-103"><a href="#cb28-103" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; 3 - Neutral; 2 - I don’t agree; 1 - I strongly don’t agree.</span></span>
+<span id="cb28-104"><a href="#cb28-104" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
+<span id="cb28-105"><a href="#cb28-105" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 1: I learned a lot during the course.</span></span>
+<span id="cb28-106"><a href="#cb28-106" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
+<span id="cb28-107"><a href="#cb28-107" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 2: I think that the knowledge acquired during the course is very</span></span>
+<span id="cb28-108"><a href="#cb28-108" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; useful.</span></span>
+<span id="cb28-109"><a href="#cb28-109" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
+<span id="cb28-110"><a href="#cb28-110" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 3: The professor used activities to make the class more engaging.</span></span>
+<span id="cb28-111"><a href="#cb28-111" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
+<span id="cb28-112"><a href="#cb28-112" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 4: If it was possible, I would enroll for a course conducted by this</span></span>
+<span id="cb28-113"><a href="#cb28-113" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; lecturer again.</span></span>
+<span id="cb28-114"><a href="#cb28-114" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
+<span id="cb28-115"><a href="#cb28-115" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 5: The classes started on time.</span></span>
+<span id="cb28-116"><a href="#cb28-116" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
+<span id="cb28-117"><a href="#cb28-117" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 6: The lecturer always used time efficiently.</span></span>
+<span id="cb28-118"><a href="#cb28-118" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
+<span id="cb28-119"><a href="#cb28-119" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 7: The lecturer delivered the class content in an understandable and</span></span>
+<span id="cb28-120"><a href="#cb28-120" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; efficient way.</span></span>
+<span id="cb28-121"><a href="#cb28-121" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
+<span id="cb28-122"><a href="#cb28-122" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 8: The lecturer was available when we had doubts.</span></span>
+<span id="cb28-123"><a href="#cb28-123" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
+<span id="cb28-124"><a href="#cb28-124" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Question 9. The lecturer treated all students equally regardless of their</span></span>
+<span id="cb28-125"><a href="#cb28-125" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; race, background and ethnicity.</span></span>
+<span id="cb28-126"><a href="#cb28-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-127"><a href="#cb28-127" aria-hidden="true" tabindex="-1"></a>These data are from the end of the winter semester of the 2020-2021 academic</span>
+<span id="cb28-128"><a href="#cb28-128" aria-hidden="true" tabindex="-1"></a>year. In the period of data collection, all university classes were entirely</span>
+<span id="cb28-129"><a href="#cb28-129" aria-hidden="true" tabindex="-1"></a>online amid the COVID-19 pandemic. While expected learning outcomes were not</span>
+<span id="cb28-130"><a href="#cb28-130" aria-hidden="true" tabindex="-1"></a>changed, the online mode of study could have affected grading policies and could</span>
+<span id="cb28-131"><a href="#cb28-131" aria-hidden="true" tabindex="-1"></a>have implications for data.</span>
+<span id="cb28-132"><a href="#cb28-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-133"><a href="#cb28-133" aria-hidden="true" tabindex="-1"></a>**Average SET scores** were combined with many other variables, including:</span>
+<span id="cb28-134"><a href="#cb28-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-135"><a href="#cb28-135" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>**characteristics of the teacher** (degree, seniority, gender, SET scores in</span>
+<span id="cb28-136"><a href="#cb28-136" aria-hidden="true" tabindex="-1"></a>the past 6 semesters).</span>
+<span id="cb28-137"><a href="#cb28-137" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>**characteristics of the course** (time of day, day of the week, course</span>
+<span id="cb28-138"><a href="#cb28-138" aria-hidden="true" tabindex="-1"></a>type, course breadth, class duration, class size).</span>
+<span id="cb28-139"><a href="#cb28-139" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>**percentage of students providing SET feedback.**</span>
+<span id="cb28-140"><a href="#cb28-140" aria-hidden="true" tabindex="-1"></a><span class="ss">4.  </span>**course grades** (mean, standard deviation, percentage failed for the</span>
+<span id="cb28-141"><a href="#cb28-141" aria-hidden="true" tabindex="-1"></a>current course and previous 6 semesters).</span>
+<span id="cb28-142"><a href="#cb28-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-143"><a href="#cb28-143" aria-hidden="true" tabindex="-1"></a>This rich dataset allows us to **investigate many of the biases in student evaluations of teaching** that have been reported in the literature and to formulate new</span>
+<span id="cb28-144"><a href="#cb28-144" aria-hidden="true" tabindex="-1"></a>hypotheses.</span>
+<span id="cb28-145"><a href="#cb28-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-146"><a href="#cb28-146" aria-hidden="true" tabindex="-1"></a>Before tackling the problems below, study the description of each variable</span>
+<span id="cb28-147"><a href="#cb28-147" aria-hidden="true" tabindex="-1"></a>included in the <span class="in">`teacher_evals_codebook.pdf`</span>.</span>
+<span id="cb28-148"><a href="#cb28-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-149"><a href="#cb28-149" aria-hidden="true" tabindex="-1"></a>**1. Load the appropriate R packages for your analysis.**</span>
+<span id="cb28-150"><a href="#cb28-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-153"><a href="#cb28-153" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-154"><a href="#cb28-154" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: setup</span></span>
+<span id="cb28-155"><a href="#cb28-155" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb28-156"><a href="#cb28-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-157"><a href="#cb28-157" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-158"><a href="#cb28-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-159"><a href="#cb28-159" aria-hidden="true" tabindex="-1"></a>**2. Load in the `teacher_evals` data.** </span>
+<span id="cb28-160"><a href="#cb28-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-163"><a href="#cb28-163" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-164"><a href="#cb28-164" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: load-data</span></span>
+<span id="cb28-165"><a href="#cb28-165" aria-hidden="true" tabindex="-1"></a>teacher_evals<span class="ot">&lt;-</span><span class="fu">read.csv</span>(<span class="st">&quot;data-raw/teacher_evals.csv&quot;</span>)</span>
+<span id="cb28-166"><a href="#cb28-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-167"><a href="#cb28-167" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-168"><a href="#cb28-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-169"><a href="#cb28-169" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data Inspection + Summary</span></span>
+<span id="cb28-170"><a href="#cb28-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-171"><a href="#cb28-171" aria-hidden="true" tabindex="-1"></a>**3. Provide a brief overview (~4 sentences) of the dataset.**</span>
+<span id="cb28-172"><a href="#cb28-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-175"><a href="#cb28-175" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-176"><a href="#cb28-176" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: explore-data</span></span>
+<span id="cb28-177"><a href="#cb28-177" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(teacher_evals)</span>
+<span id="cb28-178"><a href="#cb28-178" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(teacher_evals)</span>
+<span id="cb28-179"><a href="#cb28-179" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-180"><a href="#cb28-180" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; This dataset includes student evaluations of their teachers, and information about the teacher&#39;s educational experience and gender. Student grades and class averages are also represented in the dataset, so we have the ability to compare student performance to teacher experience level. Class time and day of the week are also variables included in the student evaluations, so we can expore whether there is any relationship between class time and student performance.</span></span>
+<span id="cb28-181"><a href="#cb28-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-182"><a href="#cb28-182" aria-hidden="true" tabindex="-1"></a>**4. What is the unit of observation (i.e. a single row in the dataset) identified by?**</span>
+<span id="cb28-183"><a href="#cb28-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-186"><a href="#cb28-186" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-187"><a href="#cb28-187" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: row-identification</span></span>
+<span id="cb28-188"><a href="#cb28-188" aria-hidden="true" tabindex="-1"></a><span class="co"># you may want to use code to answer this question</span></span>
+<span id="cb28-189"><a href="#cb28-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-190"><a href="#cb28-190" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-191"><a href="#cb28-191" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; The unit of observation is each question on the student evaluation. Each row in the dataset is the class average of student results for a single question and teacher of a class.</span></span>
+<span id="cb28-192"><a href="#cb28-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-193"><a href="#cb28-193" aria-hidden="true" tabindex="-1"></a>**5. Use _one_ `dplyr` pipeline to clean the data by:**</span>
+<span id="cb28-194"><a href="#cb28-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-195"><a href="#cb28-195" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**renaming the `gender` variable `sex`**</span>
+<span id="cb28-196"><a href="#cb28-196" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**removing all courses with fewer than 10 respondents**</span>
+<span id="cb28-197"><a href="#cb28-197" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**changing data types in whichever way you see fit (e.g., is the instructor ID really a numeric data type?)**</span>
+<span id="cb28-198"><a href="#cb28-198" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**only keeping the columns we will use -- `course_id`, `teacher_id`, `question_no`, `no_participants`, `resp_share`, `SET_score_avg`, `percent_failed_cur`, `academic_degree`, `seniority`, and `sex`**</span>
+<span id="cb28-199"><a href="#cb28-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-200"><a href="#cb28-200" aria-hidden="true" tabindex="-1"></a>**Assign your cleaned data to a new variable named `teacher_evals_clean` –- use these data going forward. Save the data as `teacher_evals_clean.csv` in the `data-clean` folder.**</span>
+<span id="cb28-201"><a href="#cb28-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-204"><a href="#cb28-204" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-205"><a href="#cb28-205" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: data-cleaning</span></span>
+<span id="cb28-206"><a href="#cb28-206" aria-hidden="true" tabindex="-1"></a>teacher_evals_clean <span class="ot">&lt;-</span> teacher_evals<span class="sc">|&gt;</span></span>
+<span id="cb28-207"><a href="#cb28-207" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">sex =</span> gender) <span class="sc">|&gt;</span> <span class="co">#rename gender as sex</span></span>
+<span id="cb28-208"><a href="#cb28-208" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(no_participants <span class="sc">&gt;=</span> <span class="dv">10</span>) <span class="sc">|&gt;</span> <span class="co">#select only classes with 10 or more students</span></span>
+<span id="cb28-209"><a href="#cb28-209" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb28-210"><a href="#cb28-210" aria-hidden="true" tabindex="-1"></a>    <span class="at">teacher_id =</span> <span class="fu">as.character</span>(teacher_id),  <span class="co">#change teacher_id to a character</span></span>
+<span id="cb28-211"><a href="#cb28-211" aria-hidden="true" tabindex="-1"></a>    <span class="at">question_no =</span> <span class="fu">as.character</span>(question_no) <span class="co">#change question_no to a character</span></span>
+<span id="cb28-212"><a href="#cb28-212" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb28-213"><a href="#cb28-213" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(course_id, teacher_id, question_no, no_participants, resp_share, </span>
+<span id="cb28-214"><a href="#cb28-214" aria-hidden="true" tabindex="-1"></a>         SET_score_avg, percent_failed_cur, academic_degree, seniority, sex) <span class="sc">|&gt;</span> <span class="co">#keeping only the columns we want </span></span>
+<span id="cb28-215"><a href="#cb28-215" aria-hidden="true" tabindex="-1"></a>  <span class="fu">write_csv</span>(<span class="st">&quot;data-clean/teacher_evals_clean.csv&quot;</span>) <span class="co">#saving clean data</span></span>
+<span id="cb28-216"><a href="#cb28-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-217"><a href="#cb28-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-218"><a href="#cb28-218" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-219"><a href="#cb28-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-220"><a href="#cb28-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-221"><a href="#cb28-221" aria-hidden="true" tabindex="-1"></a>**6. How many unique instructors and unique courses are present in the cleaned dataset?**</span>
+<span id="cb28-222"><a href="#cb28-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-225"><a href="#cb28-225" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-226"><a href="#cb28-226" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: unique-courses</span></span>
+<span id="cb28-227"><a href="#cb28-227" aria-hidden="true" tabindex="-1"></a>teacher_evals_clean<span class="sc">|&gt;</span></span>
+<span id="cb28-228"><a href="#cb28-228" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>( <span class="at">unique_instructors =</span> <span class="fu">n_distinct</span>(teacher_id),</span>
+<span id="cb28-229"><a href="#cb28-229" aria-hidden="true" tabindex="-1"></a>    <span class="at">unique_courses =</span> <span class="fu">n_distinct</span>(course_id)) <span class="co">#count number of unique teachers and courses</span></span>
+<span id="cb28-230"><a href="#cb28-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-231"><a href="#cb28-231" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-232"><a href="#cb28-232" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; There are 297 unique instructors and 939 courses.</span></span>
+<span id="cb28-233"><a href="#cb28-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-234"><a href="#cb28-234" aria-hidden="true" tabindex="-1"></a>**7. One teacher-course combination has some missing values, coded as `NA`. Which instructor has these missing values? Which course? What variable are the missing values in?**</span>
+<span id="cb28-235"><a href="#cb28-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-238"><a href="#cb28-238" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-239"><a href="#cb28-239" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: uncovering-missing-values</span></span>
+<span id="cb28-240"><a href="#cb28-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-241"><a href="#cb28-241" aria-hidden="true" tabindex="-1"></a>teacher_evals_clean<span class="sc">|&gt;</span></span>
+<span id="cb28-242"><a href="#cb28-242" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">if_any</span>(<span class="fu">everything</span>(), is.na))  <span class="co"># filter for rows with na values</span></span>
+<span id="cb28-243"><a href="#cb28-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-244"><a href="#cb28-244" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-245"><a href="#cb28-245" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Instructor 56347 in class PAB3SE004PA had missing values in the percent failed column. </span></span>
+<span id="cb28-246"><a href="#cb28-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-247"><a href="#cb28-247" aria-hidden="true" tabindex="-1"></a>**8. What are the demographics of the instructors in this study? Investigate the variables `academic_degree`, `seniority`, and `sex` and summarize your findings in ~3 complete sentences.**</span>
+<span id="cb28-248"><a href="#cb28-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-251"><a href="#cb28-251" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-252"><a href="#cb28-252" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: exploring-demographics-of-instructors</span></span>
+<span id="cb28-253"><a href="#cb28-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-254"><a href="#cb28-254" aria-hidden="true" tabindex="-1"></a><span class="co"># degree barplot</span></span>
+<span id="cb28-255"><a href="#cb28-255" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(teacher_evals_clean, <span class="fu">aes</span>(<span class="at">x =</span> academic_degree, <span class="at">fill =</span> sex)) <span class="sc">+</span></span>
+<span id="cb28-256"><a href="#cb28-256" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">&quot;stack&quot;</span>) <span class="sc">+</span></span>
+<span id="cb28-257"><a href="#cb28-257" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Academic Degree of Teachers by Sex&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Academic Degree&quot;</span>, <span class="at">y =</span> <span class="st">&quot;# of Teachers&quot;</span>) <span class="sc">+</span></span>
+<span id="cb28-258"><a href="#cb28-258" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb28-259"><a href="#cb28-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-260"><a href="#cb28-260" aria-hidden="true" tabindex="-1"></a><span class="co"># seniority barplot</span></span>
+<span id="cb28-261"><a href="#cb28-261" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(teacher_evals_clean, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(seniority), <span class="at">fill =</span> sex)) <span class="sc">+</span></span>
+<span id="cb28-262"><a href="#cb28-262" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">&quot;stack&quot;</span>) <span class="sc">+</span></span>
+<span id="cb28-263"><a href="#cb28-263" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Seniority of Teachers by Sex&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Seniority&quot;</span>, <span class="at">y =</span> <span class="st">&quot;# of Teachers&quot;</span>) <span class="sc">+</span></span>
+<span id="cb28-264"><a href="#cb28-264" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb28-265"><a href="#cb28-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-266"><a href="#cb28-266" aria-hidden="true" tabindex="-1"></a><span class="co"># sex of teachers barplot</span></span>
+<span id="cb28-267"><a href="#cb28-267" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(teacher_evals_clean, <span class="fu">aes</span>(<span class="at">x =</span> sex)) <span class="sc">+</span></span>
+<span id="cb28-268"><a href="#cb28-268" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">fill =</span> <span class="st">&quot;indianred1&quot;</span>) <span class="sc">+</span></span>
+<span id="cb28-269"><a href="#cb28-269" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Sex of Teachers&quot;</span>, <span class="at">x =</span> <span class="st">&quot;Sex&quot;</span>, <span class="at">y =</span> <span class="st">&quot;# of Teachers&quot;</span>) <span class="sc">+</span></span>
+<span id="cb28-270"><a href="#cb28-270" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb28-271"><a href="#cb28-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-272"><a href="#cb28-272" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-273"><a href="#cb28-273" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Most instructors in this dataset have a PhD (~4000 teachers) or a Masters (~2000 teachers), though there are a few (~500) with no degree, and the fewest category are professional degrees. There is a roughly even amount of male and female instructors across all degree and senority categories, except there seem to be no females with professional degrees represented. There is a roughly equal distribution if senority levels (1-11), except for the most common level being 2.</span></span>
+<span id="cb28-274"><a href="#cb28-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-275"><a href="#cb28-275" aria-hidden="true" tabindex="-1"></a>**9. Each course seems to have used a different subset of the nine evaluation questions. How many teacher-course combinations asked all nine questions?**</span>
+<span id="cb28-276"><a href="#cb28-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-279"><a href="#cb28-279" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-280"><a href="#cb28-280" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: teacher-course-asked-every-question</span></span>
+<span id="cb28-281"><a href="#cb28-281" aria-hidden="true" tabindex="-1"></a>teacher_evals_clean<span class="sc">|&gt;</span></span>
+<span id="cb28-282"><a href="#cb28-282" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(course_id, teacher_id)<span class="sc">|&gt;</span> <span class="co">#group by teacher and course</span></span>
+<span id="cb28-283"><a href="#cb28-283" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">unique_questions =</span> <span class="fu">n_distinct</span>(question_no)) <span class="sc">|&gt;</span> <span class="co">#find the number of questions asked in each course</span></span>
+<span id="cb28-284"><a href="#cb28-284" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(unique_questions <span class="sc">==</span> <span class="dv">9</span>) <span class="co">#select courses who asked all 9 questions</span></span>
+<span id="cb28-285"><a href="#cb28-285" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-286"><a href="#cb28-286" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; There are 49 teacher-course combinations who asked all 9 questions</span></span>
+<span id="cb28-287"><a href="#cb28-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-288"><a href="#cb28-288" aria-hidden="true" tabindex="-1"></a><span class="fu">## Rate my Professor</span></span>
+<span id="cb28-289"><a href="#cb28-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-290"><a href="#cb28-290" aria-hidden="true" tabindex="-1"></a>**10. Which instructors had the highest and lowest average rating for Question 1 (I learnt a lot during the course.) across all their courses?**</span>
+<span id="cb28-291"><a href="#cb28-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-294"><a href="#cb28-294" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-295"><a href="#cb28-295" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: question-1-high-low</span></span>
+<span id="cb28-296"><a href="#cb28-296" aria-hidden="true" tabindex="-1"></a>teacher_evals_clean<span class="sc">|&gt;</span></span>
+<span id="cb28-297"><a href="#cb28-297" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(question_no <span class="sc">==</span> <span class="dv">901</span>)<span class="sc">|&gt;</span> <span class="co">#filter for question 1</span></span>
+<span id="cb28-298"><a href="#cb28-298" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(teacher_id, course_id) <span class="sc">|&gt;</span> <span class="co">#group by teacher and course</span></span>
+<span id="cb28-299"><a href="#cb28-299" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">avg_rating =</span> <span class="fu">mean</span>(SET_score_avg, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span> <span class="co">#average scores for each teacher across their courses</span></span>
+<span id="cb28-300"><a href="#cb28-300" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb28-301"><a href="#cb28-301" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb28-302"><a href="#cb28-302" aria-hidden="true" tabindex="-1"></a>    <span class="at">highest_teacher =</span> teacher_id[<span class="fu">which.max</span>(avg_rating)], </span>
+<span id="cb28-303"><a href="#cb28-303" aria-hidden="true" tabindex="-1"></a>    <span class="at">lowest_teacher =</span> teacher_id[<span class="fu">which.min</span>(avg_rating)],</span>
+<span id="cb28-304"><a href="#cb28-304" aria-hidden="true" tabindex="-1"></a>    <span class="at">highest_rating =</span> <span class="fu">max</span>(avg_rating),</span>
+<span id="cb28-305"><a href="#cb28-305" aria-hidden="true" tabindex="-1"></a>    <span class="at">lowest_rating =</span> <span class="fu">min</span>(avg_rating))</span>
+<span id="cb28-306"><a href="#cb28-306" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-307"><a href="#cb28-307" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-308"><a href="#cb28-308" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; 100131 had the highest average SET score and 100132 had the lowest. </span></span>
+<span id="cb28-309"><a href="#cb28-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-310"><a href="#cb28-310" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; I recieved help with which. functions from https://r-coder.com/which-max-min-r/</span></span>
+<span id="cb28-311"><a href="#cb28-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-312"><a href="#cb28-312" aria-hidden="true" tabindex="-1"></a>**11. Which instructors with one year of experience had the highest and lowest average percentage of students failing in the current semester across all their courses?**</span>
+<span id="cb28-313"><a href="#cb28-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-316"><a href="#cb28-316" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-317"><a href="#cb28-317" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: one-year-experience-failing-students</span></span>
+<span id="cb28-318"><a href="#cb28-318" aria-hidden="true" tabindex="-1"></a>teacher_evals_clean <span class="sc">|&gt;</span></span>
+<span id="cb28-319"><a href="#cb28-319" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(seniority <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">|&gt;</span> <span class="co">#filter for a seniority level of 1</span></span>
+<span id="cb28-320"><a href="#cb28-320" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(teacher_id) <span class="sc">|&gt;</span></span>
+<span id="cb28-321"><a href="#cb28-321" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb28-322"><a href="#cb28-322" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_fail_percent =</span> <span class="fu">mean</span>(percent_failed_cur, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb28-323"><a href="#cb28-323" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> <span class="co">#average fail rate across all the teachers classes</span></span>
+<span id="cb28-324"><a href="#cb28-324" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb28-325"><a href="#cb28-325" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb28-326"><a href="#cb28-326" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_fail_teacher =</span> teacher_id[<span class="fu">which.min</span>(avg_fail_percent)],<span class="co"># find the min fail rate</span></span>
+<span id="cb28-327"><a href="#cb28-327" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_fail_teacher =</span> teacher_id[<span class="fu">which.max</span>(avg_fail_percent)],<span class="co"># find the max fail rate</span></span>
+<span id="cb28-328"><a href="#cb28-328" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_fail =</span> <span class="fu">min</span>(avg_fail_percent),</span>
+<span id="cb28-329"><a href="#cb28-329" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_fail =</span> <span class="fu">max</span>(avg_fail_percent)</span>
+<span id="cb28-330"><a href="#cb28-330" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb28-331"><a href="#cb28-331" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-332"><a href="#cb28-332" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Instructor 102379 had the lowest fail rate (0%) in that semester and 106692 had the highest (.68%).</span></span>
+<span id="cb28-333"><a href="#cb28-333" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-334"><a href="#cb28-334" aria-hidden="true" tabindex="-1"></a>**12. Which female instructors with either a doctorate or professional degree had the highest and lowest average percent of students responding to the evaluation across all their courses?**</span>
+<span id="cb28-335"><a href="#cb28-335" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-338"><a href="#cb28-338" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb28-339"><a href="#cb28-339" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: female-instructor-student-response</span></span>
+<span id="cb28-340"><a href="#cb28-340" aria-hidden="true" tabindex="-1"></a>teacher_evals_clean <span class="sc">|&gt;</span></span>
+<span id="cb28-341"><a href="#cb28-341" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(sex <span class="sc">==</span> <span class="st">&quot;female&quot;</span>, </span>
+<span id="cb28-342"><a href="#cb28-342" aria-hidden="true" tabindex="-1"></a>         (academic_degree <span class="sc">==</span> <span class="st">&quot;dr&quot;</span> <span class="sc">|</span> academic_degree <span class="sc">==</span> <span class="st">&quot;prof&quot;</span>)) <span class="sc">|&gt;</span> <span class="co">#filter for females with doctorates and prof degrees</span></span>
+<span id="cb28-343"><a href="#cb28-343" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(teacher_id) <span class="sc">|&gt;</span></span>
+<span id="cb28-344"><a href="#cb28-344" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb28-345"><a href="#cb28-345" aria-hidden="true" tabindex="-1"></a>    <span class="at">avg_resp_share =</span> <span class="fu">mean</span>(resp_share, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="co">#calculate the mean % of students who responded for each teacher across all courses</span></span>
+<span id="cb28-346"><a href="#cb28-346" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb28-347"><a href="#cb28-347" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb28-348"><a href="#cb28-348" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb28-349"><a href="#cb28-349" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_resp_teacher =</span> teacher_id[<span class="fu">which.min</span>(avg_resp_share)],</span>
+<span id="cb28-350"><a href="#cb28-350" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_resp_teacher =</span> teacher_id[<span class="fu">which.max</span>(avg_resp_share)],</span>
+<span id="cb28-351"><a href="#cb28-351" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_resp =</span> <span class="fu">min</span>(avg_resp_share), <span class="co">#print the minimum number responses</span></span>
+<span id="cb28-352"><a href="#cb28-352" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_resp =</span> <span class="fu">max</span>(avg_resp_share)) <span class="co">#print the maximum number responses</span></span>
+<span id="cb28-353"><a href="#cb28-353" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-354"><a href="#cb28-354" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb28-355"><a href="#cb28-355" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Female instructor 59338 had the lowest response rate, and instructor 101508 had the highest. </span></span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

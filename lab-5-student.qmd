@@ -254,7 +254,7 @@ ggplot(teacher_evals_clean, aes(x = sex)) +
   theme_minimal()
 
 ```
-> Most instructors in this dataset have a PhD (~4000 teachers) or a Masters (~2000 teachers), though there are a few (~500) with no degree, and the fewest ctegory are full professors. There is a roughly even amount of male and female instructors across all degree and senority categories, except there seem to be no female professors represented. There is a roughly equal distribution if senority levels (1-11), except for the most common level being 2.
+> Most instructors in this dataset have a PhD (~4000 teachers) or a Masters (~2000 teachers), though there are a few (~500) with no degree, and the fewest category are professional degrees. There is a roughly even amount of male and female instructors across all degree and senority categories, except there seem to be no females with professional degrees represented. There is a roughly equal distribution if senority levels (1-11), except for the most common level being 2.
 
 **9. Each course seems to have used a different subset of the nine evaluation questions. How many teacher-course combinations asked all nine questions?**
 
@@ -307,12 +307,25 @@ teacher_evals_clean |>
     max_fail = max(avg_fail_percent)
   )
 ```
-> instructor 102379 had the lowest fail rate (0%) in that semester and 106692 had the highest (.68%).
+> Instructor 102379 had the lowest fail rate (0%) in that semester and 106692 had the highest (.68%).
 
 **12. Which female instructors with either a doctorate or professional degree had the highest and lowest average percent of students responding to the evaluation across all their courses?**
 
 ```{r}
 #| label: female-instructor-student-response
-# code chunk for Q11
+teacher_evals_clean |>
+  filter(sex == "female", 
+         (academic_degree == "dr" | academic_degree == "prof")) |> #filter for females with doctorates and prof degrees
+  group_by(teacher_id) |>
+  summarise(
+    avg_resp_share = mean(resp_share, na.rm = TRUE) #calculate the mean % of students who responded for each teacher across all courses
+  ) |>
+  ungroup() |>
+  summarise(
+    min_resp_teacher = teacher_id[which.min(avg_resp_share)],
+    max_resp_teacher = teacher_id[which.max(avg_resp_share)],
+    min_resp = min(avg_resp_share), #print the minimum number responses
+    max_resp = max(avg_resp_share)) #print the maximum number responses
 
 ```
+> Female instructor 59338 had the lowest response rate, and instructor 101508 had the highest. 
